@@ -10,13 +10,17 @@ homepage = "https://github.com/tmaklin/sablast"
 repository = "https://github.com/tmaklin/sablast"
 license = "MIT OR Apache-2.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package.metadata.patch]
+crates = ["needletail", "sbwt"]
+
+[patch.crates-io]
+needletail = { path="./target/patch/needletail-0.5.1" }
+sbwt = { path="./target/patch/sbwt-0.3.2" }
 
 [dependencies]
 ## core
-# TODO Re-enable reading compressed sequences in needletail
-# This requires resolving the libllzma linker issue in build_artifacts.yml
-needletail = { version = "0.5.1", default-features = false }
+### Disable bzip2 and liblzma because of build issues with target wasm32-wasip1
+needletail = { version = "0.5.1", default-features = false, features = ["flate2"] }
 rayon = "1"
 sbwt = "0.3.2"
 
@@ -29,6 +33,9 @@ embed-doc-image="0.1.4"
 ## logging
 log = "0.4.20"
 stderrlog = "0.6.0"
+
+[build-dependencies]
+patch-crate = "0.1"
 
 [dev-dependencies]
 ## tests

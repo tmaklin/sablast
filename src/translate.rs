@@ -338,7 +338,10 @@ pub fn translate_ms_vec(
 /// let query: Vec<u8> = vec![b'T',b'T',b'G',b'A',b'G',b'G',b'C',b'T',b'G',b'G',b'G',b'G',b'A',b'G',b'A',b'G',b'C',b'T',b'G'];
 /// let reference: Vec<u8> = vec![b'T',b'T',b'G',b'A',b'T',b'T',b'G',b'G',b'C',b'T',b'G',b'G',b'G',b'C',b'A',b'G',b'A',b'G',b'C',b'T',b'G'];
 ///
-/// let (sbwt, lcs) = build(&[query], BuildOpts{ k: 4, build_select: true, ..Default::default() });
+/// let mut opts = BuildOpts::default();
+/// opts.k = 4;
+/// opts.build_select = true;
+/// let (sbwt, lcs) = build(&[query], opts);
 ///
 /// let k = match sbwt {
 ///     SbwtIndexVariant::SubsetMatrix(ref sbwt) => {

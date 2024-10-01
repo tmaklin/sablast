@@ -86,15 +86,13 @@ fn main() {
         }) => {
 	    init_log(if *verbose { 2 } else { 1 });
 
-            let sbwt_build_options = sablast::index::BuildOpts {
-		k: *kmer_size,
-		num_threads: *num_threads,
-		prefix_precalc: *prefix_precalc,
-		dedup_batches: *dedup_batches,
-		mem_gb: *mem_gb,
-		temp_dir: temp_dir.clone(),
-                ..Default::default()
-            };
+            let mut sbwt_build_options = sablast::index::BuildOpts::default();
+	    sbwt_build_options.k = *kmer_size;
+	    sbwt_build_options.num_threads = *num_threads;
+	    sbwt_build_options.prefix_precalc = *prefix_precalc;
+	    sbwt_build_options.dedup_batches = *dedup_batches;
+	    sbwt_build_options.mem_gb = *mem_gb;
+	    sbwt_build_options.temp_dir = temp_dir.clone();
 
 	    info!("Building SBWT index from {} files...", seq_files.len());
 	    let mut seq_data: Vec<Vec<u8>> = Vec::new();
@@ -122,15 +120,13 @@ fn main() {
 	    verbose,
         }) => {
 	    init_log(if *verbose { 2 } else { 1 });
-            let sbwt_build_options = sablast::index::BuildOpts {
-		k: *kmer_size,
-		num_threads: *num_threads,
-		prefix_precalc: *prefix_precalc,
-		dedup_batches: *dedup_batches,
-		mem_gb: *mem_gb,
-		temp_dir: temp_dir.clone(),
-                ..Default::default()
-            };
+            let mut sbwt_build_options = sablast::index::BuildOpts::default();
+	    sbwt_build_options.k = *kmer_size;
+	    sbwt_build_options.num_threads = *num_threads;
+	    sbwt_build_options.prefix_precalc = *prefix_precalc;
+	    sbwt_build_options.dedup_batches = *dedup_batches;
+	    sbwt_build_options.mem_gb = *mem_gb;
+	    sbwt_build_options.temp_dir = temp_dir.clone();
 
 	    let ((sbwt, lcs), ref_name) = if index_prefix.is_some() && !ref_file.is_some() {
 		info!("Loading SBWT index...");
@@ -190,19 +186,17 @@ fn main() {
 	    verbose,
         }) => {
 	    init_log(if *verbose { 2 } else { 1 });
-            let sbwt_build_options = sablast::index::BuildOpts {
-		// These are required for the subcommand to work correctly
-		add_revcomp: true,
-		build_select: true,
-		// These can be adjusted
-		k: *kmer_size,
-		num_threads: *num_threads,
-		prefix_precalc: *prefix_precalc,
-		dedup_batches: *dedup_batches,
-		mem_gb: *mem_gb,
-		temp_dir: temp_dir.clone(),
-                ..Default::default()
-            };
+            let mut sbwt_build_options = sablast::index::BuildOpts::default();
+	    // These are required for the subcommand to work correctly
+	    sbwt_build_options.add_revcomp = true;
+	    sbwt_build_options.build_select = true;
+	    // These can be adjusted
+	    sbwt_build_options.k = *kmer_size;
+	    sbwt_build_options.num_threads = *num_threads;
+	    sbwt_build_options.prefix_precalc = *prefix_precalc;
+	    sbwt_build_options.dedup_batches = *dedup_batches;
+	    sbwt_build_options.mem_gb = *mem_gb;
+	    sbwt_build_options.temp_dir = temp_dir.clone();
 
 	    rayon::ThreadPoolBuilder::new()
 		.num_threads(*num_threads)

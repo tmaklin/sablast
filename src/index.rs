@@ -33,21 +33,34 @@ use sbwt::SbwtIndexVariant;
 /// - Deduplicate _k_-mer batches in construction algorithm `dedup_batches`.
 /// - Temporary directory path `temp_dir`.
 ///
-/// Implements [BuildOpts::default] with these values:
+/// Note that this struct is marked non_exhaustive, meaning that new
+/// public fields may be added in the future.
+///
+/// Same as initializing manually with these values:
 /// ```rust
-/// sablast::index::BuildOpts {
-///     k: 31,
-///     add_revcomp: false,
-///     num_threads: 1,
-///     prefix_precalc: 8,
-///     build_select: false,
-///     mem_gb: 4,
-///     dedup_batches: false,
-///     temp_dir: None,
-/// };
+/// let mut opts = sablast::index::BuildOpts::default();
+/// opts.k = 31;
+/// opts.add_revcomp = false;
+/// opts.num_threads = 1;
+/// opts.prefix_precalc = 8;
+/// opts.build_select = false;
+/// opts.mem_gb = 4;
+/// opts.dedup_batches = false;
+/// opts.temp_dir = None;
+///
+/// # let expected = sablast::index::BuildOpts::default();
+/// # assert_eq!(opts.k, expected.k);
+/// # assert_eq!(opts.add_revcomp, expected.add_revcomp);
+/// # assert_eq!(opts.num_threads, expected.num_threads);
+/// # assert_eq!(opts.prefix_precalc, expected.prefix_precalc);
+/// # assert_eq!(opts.build_select, expected.build_select);
+/// # assert_eq!(opts.mem_gb, expected.mem_gb);
+/// # assert_eq!(opts.dedup_batches, expected.dedup_batches);
+/// # assert_eq!(opts.temp_dir, expected.temp_dir);
 /// ```
 ///
 #[derive(Clone)]
+#[non_exhaustive]
 pub struct BuildOpts {
     pub k: usize,
     pub add_revcomp: bool,
@@ -97,7 +110,9 @@ impl Default for BuildOpts {
 /// let reference: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
 ///
 /// // Build the SBWT
-/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(BuildOpts{ k: 3, ..Default::default() }));
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(opts));
 /// ```
 ///
 pub fn build_sbwt_from_vecs(
@@ -144,7 +159,9 @@ pub fn build_sbwt_from_vecs(
 /// let reference: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
 ///
 /// // Build the SBWT
-/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(BuildOpts{ k: 3, ..Default::default() }));
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(opts));
 ///
 /// // Serialize the sbwt to $TMPDIR/serialized_index_1
 /// let index_prefix = std::env::temp_dir().to_str().unwrap().to_owned() + "/serialized_index_1";
@@ -195,7 +212,9 @@ pub fn serialize_sbwt(
 /// let reference: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
 ///
 /// // Build the SBWT
-/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(BuildOpts{ k: 3, ..Default::default() }));
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(opts));
 ///
 /// // Serialize the sbwt to $TMPDIR/serialized_index_2
 /// let index_prefix = std::env::temp_dir().to_str().unwrap().to_owned() + "/serialized_index_2";
@@ -252,7 +271,9 @@ pub fn load_sbwt(
 /// let query: Vec<u8> = vec![b'C',b'A',b'A',b'G',b'C',b'C',b'A',b'C',b'T',b'C',b'A',b'T',b'T',b'G',b'G',b'G',b'T',b'C'];
 ///
 /// // Build the SBWT
-/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(BuildOpts{ k: 3, ..Default::default() }));
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build_sbwt_from_vecs(&reference, &Some(opts));
 ///
 /// // Run query
 /// let ms: Vec<usize> = query_sbwt(&query, &sbwt, &lcs).iter().map(|x| x.0).collect();

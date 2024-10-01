@@ -47,7 +47,8 @@ pub mod translate;
 ///
 /// let inputs: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
 ///
-/// let (sbwt_index, lcs_array) = build(&inputs, BuildOpts::default());
+/// let opts = BuildOpts::default();
+/// let (sbwt_index, lcs_array) = build(&inputs, opts);
 /// ```
 ///
 pub fn build(
@@ -82,7 +83,9 @@ pub fn build(
 /// use sablast::index::BuildOpts;
 ///
 /// let reference: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
-/// let (sbwt, lcs) = build(&reference, BuildOpts{ k: 3, ..Default::default() });
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build(&reference, opts);
 ///
 /// let query = vec![b'G',b'T',b'G',b'A',b'C',b'T',b'A',b'T',b'G',b'A',b'G',b'G',b'A',b'T'];
 ///
@@ -124,7 +127,10 @@ pub fn matches(
 /// use sablast::index::BuildOpts;
 ///
 /// let query: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
-/// let (sbwt_query, lcs_query) = build(&query, BuildOpts{ k: 3, build_select: true, ..Default::default() });
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// opts.build_select = true;
+/// let (sbwt_query, lcs_query) = build(&query, opts);
 ///
 /// let reference = vec![b'G',b'T',b'G',b'A',b'C',b'T',b'A',b'T',b'G',b'A',b'G',b'G',b'A',b'T'];
 ///
@@ -174,7 +180,9 @@ pub fn map(
 /// use sablast::index::BuildOpts;
 ///
 /// let reference: Vec<Vec<u8>> = vec![vec![b'A',b'A',b'A',b'G',b'A',b'A',b'C',b'C',b'A',b'-',b'T',b'C',b'A',b'G',b'G',b'G',b'C',b'G']];
-/// let (sbwt, lcs) = build(&reference, BuildOpts{ k: 3, ..Default::default() });
+/// let mut opts = BuildOpts::default();
+/// opts.k = 3;
+/// let (sbwt, lcs) = build(&reference, opts);
 ///
 /// let query = vec![b'G',b'T',b'G',b'A',b'C',b'T',b'A',b'T',b'G',b'A',b'G',b'G',b'A',b'T'];
 ///

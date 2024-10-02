@@ -18,7 +18,7 @@ license = "MIT OR Apache-2.0"
 # This requires resolving the libllzma linker issue in build_artifacts.yml
 needletail = { version = "0.5.1", default-features = false }
 rayon = "1"
-sbwt = "0.3.1"
+sbwt = "0.3.2"
 
 ## cli
 clap = { version = "4", features = ["derive"] }

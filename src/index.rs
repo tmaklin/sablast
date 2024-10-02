@@ -122,12 +122,10 @@ pub fn build_sbwt_from_vecs(
     assert!(!slices.is_empty());
 
     let build_opts = if build_options.is_some() { build_options.clone().unwrap() } else { BuildOpts::default() };
-    let temp_dir = if build_opts.temp_dir.is_some() { build_opts.temp_dir.unwrap() } else { std::env::temp_dir().to_str().unwrap().to_string() };
 
     let algorithm = BitPackedKmerSorting::new()
 	.mem_gb(build_opts.mem_gb)
-	.dedup_batches(build_opts.dedup_batches)
-	.temp_dir(PathBuf::from(OsString::from(temp_dir)).as_path());
+	.dedup_batches(build_opts.dedup_batches);
 
     let (sbwt, lcs) = SbwtIndexBuilder::new()
 	.k(build_opts.k)

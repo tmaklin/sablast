@@ -207,7 +207,7 @@ fn main() {
 	    let ref_data = read_fastx_file(ref_file);
 
 	    let stdout = std::io::stdout();
-	    query_files.par_iter().for_each(|query_file| {
+	    query_files.iter().for_each(|query_file| {
 		let query_data = read_fastx_file(query_file);
 		let (sbwt, lcs) = sablast::index::build_sbwt_from_vecs(&query_data, &Some(sbwt_build_options.clone()));
 

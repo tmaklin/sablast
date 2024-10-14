@@ -12,10 +12,8 @@
 // at your option.
 //
 //! Wrapper for using the [sbwt](https://docs.rs/sbwt) API to build and query SBWT indexes.
-use std::ffi::OsString;
 use std::io::Write;
 use std::ops::Range;
-use std::path::PathBuf;
 
 use sbwt::BitPackedKmerSorting;
 use sbwt::SbwtIndexBuilder;
@@ -279,19 +277,80 @@ pub fn load_sbwt(
 /// # assert_eq!(ms, vec![1,2,2,3,2,2,3,2,1,2,3,1,1,1,2,3,1,2]);
 /// ```
 ///
+
+use sbwt::ExtendRight;
+use sbwt::ContractLeft;
+use rayon::prelude::ParallelSlice;
+use rayon::iter::ParallelIterator;
+
 pub fn query_sbwt(
     query: &[u8],
     sbwt: &sbwt::SbwtIndexVariant,
     lcs: &sbwt::LcsArray,
 ) -> Vec<(usize, Range<usize>)> {
     assert!(!query.is_empty());
-    let ms = match sbwt {
+    match sbwt {
         SbwtIndexVariant::SubsetMatrix(index) => {
-	    let streaming_index = sbwt::StreamingIndex::new(index, lcs);
-	    streaming_index.matching_statistics(query)
-	},
-    };
-    ms
+
+            // Query SBWT index in parallel
+            //
+            // This splits the query into n_threads chunks. The matching
+            // statistics in a chunk are independent from the other chunks
+            // _except_ for the first k k-mers which will be wrong.
+
+            let n_bases = query.len();
+            let k = index.k();
+            let chunk_size_guess = n_bases/rayon::current_num_threads();
+            let chunk_size = std::cmp::max(chunk_size_guess, k);
+            let n_chunks = n_bases/chunk_size;
+
+            let mut ms = query.par_chunks(chunk_size).map(|chunk| {
+                let mut colex_rank = 0..lcs.len();
+                let mut d = 0_usize;
+                chunk.iter().map(|byte| {
+                    let mut colex_rank_c = index.extend_right(colex_rank.clone(), *byte);
+                    while d > 0 && colex_rank_c.is_empty() {
+                        colex_rank = lcs.contract_left(colex_rank.clone(), d-1);
+                        d -= 1;
+                        colex_rank_c = index.extend_right(colex_rank.clone(), *byte);
+                    }
+                    if !colex_rank_c.is_empty() {
+                        colex_rank = colex_rank_c;
+                        d = std::cmp::min(index.k(), d+1);
+                    }
+                    (d, colex_rank.clone())
+                }).collect::<Vec<(usize, Range<usize>)>>()
+            }).flatten().collect::<Vec<(usize, Range<usize>)>>();
+
+            // Correct the first k k-mers after a breakpoint between chunks by
+            // iterating over the breakpoint in a (bp_start, bp_start + k + 1)
+            // window.
+
+            if chunk_size != n_bases {
+                for t in 1..(n_chunks + 1) {
+                    let start = std::cmp::max(chunk_size*t, 0);
+                    let end = std::cmp::min(chunk_size*t + k + 1, n_bases);
+                    let mut colex_rank = ms[start - 1].1.clone();
+                    let mut d = ms[start - 1].0;
+                    ((start)..(end)).for_each(|i| {
+                        let mut colex_rank_c = index.extend_right(colex_rank.clone(), query[i]);
+                        while d > 0 && colex_rank_c.is_empty() {
+                            colex_rank = lcs.contract_left(colex_rank.clone(), d-1);
+                            d -= 1;
+                            colex_rank_c = index.extend_right(colex_rank.clone(), query[i]);
+                        }
+                        if !colex_rank_c.is_empty() {
+                            colex_rank = colex_rank_c;
+                            d = std::cmp::min(index.k(), d+1);
+                        }
+                        ms[i] = (d, colex_rank.clone());
+                    });
+                }
+            }
+            ms
+
+        },
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
